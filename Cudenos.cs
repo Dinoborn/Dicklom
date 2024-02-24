@@ -1,38 +1,41 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.SceneManagement;
+using UnityEngine.AI;
 
 public class Cudenos : MonoBehaviour
 {
-    [SerializeField] KeyCode keyOne;
-    [SerializeField] KeyCode keyTwo;
-    [SerializeField] Vector3 moveDirection;
+    private NavMeshAgent agent;
+    private Camera camera;
+    private Vector3 destination;
 
-    private void FixedUpdate()
+    private void Start()
     {
-        if (Input.GetKey(keyOne))
-        {
-            GetComponent<Rigidbody>().velocity += moveDirection;
-        }
-        if (Input.GetKey(keyTwo))
-        {
-            GetComponent<Rigidbody>().velocity -= moveDirection;
-        }
-        if (Input.GetKey(KeyCode.R))
-        {
-            SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
-        }
-
-    }
-    private void OnTriggerEnter(Collider other)
-    {
-    if (this.CompareTag("Player") && other.CompareTag("Finish"))
-        {
-            SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
-        }
+        agent = GetComponent<NavMeshAgent>();
+        camera = Camera.main;
     }
 
+    private void Update()
+    {
+        if (Input.GetMouseButtonDown(0))
+        {
+            Vector3 mousePosition = Input.mousePosition;
+            Ray ray = camera.ScreenPointToRay(mousePosition);
+            RaycastHit hit;
 
-
+            if (Physics.Raycast(ray, out hit))
+            {
+                if (hit.collider.gameObject.CompareTag("Ground"))
+                {
+                    destination = hit.point;
+                    agent.SetDestination(destination);
+                }
+            }
+        }
+    }
 }
+
+
+
+
+
